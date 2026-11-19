@@ -9,6 +9,7 @@ const Welcome = (() => {
     const connected = window.Drive && Drive.isConnected && Drive.isConnected();
     if (seen() || connected) return;
     el('welcome').style.display = 'flex';
+    if (window.Drive && Drive.configured && Drive.configured()) Drive.loadGis().catch(() => {});   // preload so the sign-in popup isn't blocked
     if (!(window.Drive && Drive.configured && Drive.configured())) {
       el('welcome-pop-text').textContent = 'Your writing is saved privately on this device, in this browser. You can back it up any time from Backup & Sync.';
       el('welcome-go').textContent = 'Continue';
