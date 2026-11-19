@@ -15,12 +15,13 @@ const Welcome = (() => {
     }
   }
   function ask() { el('welcome-pop').classList.add('open'); }
-  function later() { el('welcome-pop').classList.remove('open'); }
+  function later() { el('welcome-pop').classList.remove('open'); close(); }   // "Not now": enter the app without signing in
   function close() { mark(); const w = el('welcome'); w.classList.add('leaving'); setTimeout(() => { w.style.display = 'none'; }, 450); }
   async function go() {
     if (window.Drive && Drive.configured && Drive.configured()) {
-      el('welcome-pop').classList.remove('open');
       await Drive.connect();
+      // Only enter the app once Google sign-in actually worked; if it was cancelled, stay here so they can retry or pick "Not now".
+      if (!Drive.isConnected()) return;
     }
     close();
   }
