@@ -1,0 +1,21 @@
+{
+ "female": {
+  "bangs": 6,
+  "bob": 6,
+  "messy-bun": 6,
+  "long-straight-hair": 6,
+  "messy-braid": 6,
+  "curly": 6,
+  "low-ponytail": 6,
+  "half-up": 6,
+  "medium-length": 6,
+  "high-ponytail": 6
+ },
+ "male": {
+  "messy-sideswept": 4,
+  "neat": 4,
+  "shoulder-length": 4,
+  "tousled": 4,
+  "spiky": 4
+ }
+}

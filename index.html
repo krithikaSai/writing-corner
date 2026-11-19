@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing Corner</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&family=Lato:wght@400;700&family=Cinzel:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232b1d17'/%3E%3Cpath d='M44 10l10 10-24 24-14 4 4-14z' fill='%23c9a24d'/%3E%3Cpath d='M16 48l-2 6 6-2z' fill='%23e8d4a0'/%3E%3Cpath d='M38 16l10 10' stroke='%232b1d17' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-light">
+  <div id="mobile-gate" style="display:none; position:fixed; inset:0; background:#0f0f1a;
+  color:#e8e0d5; font-family:'Georgia',serif; z-index:9999;
+  flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:40px; gap:20px;">
+  <div style="font-size:2.5rem;">✒</div>
+  <div style="font-size:1.4rem; letter-spacing:0.1em;">Writing Corner</div>
+  <div style="font-size:1rem; color:#a09880; line-height:1.8; max-width:300px;">
+    This app is designed for desktop use.<br>
+    Please open it on a laptop or desktop computer for the best experience.
+  </div>
+</div>
+
+<script>
+  if (window.innerWidth < 768) {
+    document.getElementById('mobile-gate').style.display = 'flex';
+    document.querySelector('.app-shell').style.display = 'none';
+  }
+</script>
+
+<!-- ══════════════ WELCOME PAGE ══════════════ -->
+<div id="welcome" class="welcome" style="display:none">
+  <div class="welcome-art"><img src="images/welcome.jpg" alt="" onerror="this.remove()"></div>
+  <div class="welcome-card">
+    <div class="welcome-pen"><svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true"><path d="M44 8l12 12-26 26-16 5 5-16z"/><path d="M12 52l-3 8 8-3z" opacity=".55"/></svg></div>
+    <h1>Writing Corner</h1>
+    <p>A cosy place to plan and write your stories &mdash; characters, places, chapters and a notebook for every idea.</p>
+    <button class="btn-welcome" onclick="Welcome.ask()">Sign in with Google to get started</button>
+  </div>
+  <div class="welcome-pop" id="welcome-pop">
+    <div class="welcome-pop-box">
+      <div class="welcome-pop-title">Before you begin</div>
+      <p id="welcome-pop-text">Your writing is saved in your own Google Drive, in a private hidden spot that only this app can open. The app&rsquo;s author never sees it, and you can disconnect at any time.</p>
+      <div class="welcome-pop-btns">
+        <button class="btn-ghost" onclick="Welcome.later()">Not now</button>
+        <button class="btn-welcome" id="welcome-go" onclick="Welcome.go()">Continue with Google</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="app-shell">
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Writing Corner</h1>
+      <button class="project-chip" onclick="Projects.open()" title="Switch or create projects">
+        <span class="project-chip-name" id="project-chip-name">My Novel</span><span class="project-chip-caret">▾</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Workspace</div>
+      <button class="nav-btn active" onclick="showPanel('overview')"><span>Overview</span>
+      </button>
+      <button class="nav-btn" onclick="showPanel('brainstorm')"><span>Brainstorm</span>
+      </button>
+
+      <div class="nav-section-label">Story Elements</div>
+      <button class="nav-btn" onclick="showPanel('characters')"><span>Characters</span>
+        <span class="nav-count" id="nav-char-count">0</span>
+      </button>
+      <button class="nav-btn" onclick="showPanel('places')"><span>Places</span>
+        <span class="nav-count" id="nav-place-count">0</span>
+      </button>
+
+      <div class="nav-section-label">Manuscript</div>
+      <button class="nav-btn" onclick="showPanel('chapters')"><span>Chapters</span>
+        <span class="nav-count" id="nav-ch-count">0</span>
+      </button>
+      <button class="nav-btn" onclick="showPanel('writing')"><span>Write</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="nav-btn" onclick="openModal('project')"><span>⚙ Project Settings</span></button>
+    </div>
+
+  </aside>
+
+  <!-- ══════════════ MAIN ══════════════ -->
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title"></span>
+      <div class="topbar-actions">
+        <span class="unsaved-dot" id="unsaved-dot" title="Unsaved changes"></span>
+        <span class="sync-status backup-chip" id="backup-status" onclick="Backup.openModal()" title="Backup & Sync">…</span>
+        <button class="btn btn-sm" onclick="Backup.openModal()">☁ Backup &amp; Sync</button>
+        <button class="btn btn-accent btn-sm" onclick="App.save()">Save</button>
+      </div>
+    </div>
+
+    <!-- ══ OVERVIEW PANEL ══ -->
+    <div class="panel active" id="panel-overview">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+        <div class="page-heading" style="margin:0">
+          <div class="page-title" id="ov-project-title">My Novel</div>
+          <div class="page-sub" id="ov-project-sub">Start writing your story</div>
+        </div>
+      </div>
+
+      <div class="stat-cards">
+        <div class="stat-card"><div class="stat-num" id="stat-words">0</div><div class="stat-label">Words Written</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-chapters">0</div><div class="stat-label">Chapters</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-chars">0</div><div class="stat-label">Characters</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-places">0</div><div class="stat-label">Places</div></div>
+      </div>
+
+      <div class="panel-grid panel-grid-2">
+        <div class="card">
+          <div class="card-title">Synopsis</div>
+          <textarea id="project-synopsis" class="form-textarea" style="min-height:190px;font-size:0.95rem;" placeholder="What is your story about?" oninput="App.markUnsaved()"></textarea>
+          <div class="card-title" style="margin-top:16px;">Genre</div>
+          <input id="project-tags" class="form-input" placeholder="e.g. Historical Fiction, Mystery, Suspense" oninput="App.markUnsaved()" style="margin-top:4px;">
+        </div>
+        <div class="card">
+          <div class="card-title">Writing Calendar</div>
+          <div id="writing-calendar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BRAINSTORM PANEL ══ -->
+    <div class="panel" id="panel-brainstorm">
+      <div class="page-heading">
+        <div class="page-title">Brainstorm Board</div>
+        <div class="page-sub">Sticky notes and a whiteboard for your ideas</div>
+      </div>
+      <div class="brainstorm-tabs">
+        <button class="brainstorm-tab active" onclick="switchBrainstormTab('stickies',this)">Sticky Notes</button>
+        <button class="brainstorm-tab" onclick="switchBrainstormTab('whiteboard',this)">Whiteboard</button>
+      </div>
+
+      <!-- Stickies -->
+      <div class="brainstorm-pane active" id="pane-stickies">
+        <div class="brainstorm-board">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div class="card-title" style="margin:0">Add a note:</div>
+            <div class="add-sticky-btns">
+              <button class="add-sticky-btn sticky-yellow" title="Yellow" onclick="Brainstorm.addSticky('yellow')">+</button>
+              <button class="add-sticky-btn sticky-pink" title="Pink" onclick="Brainstorm.addSticky('pink')">+</button>
+              <button class="add-sticky-btn sticky-blue" title="Blue" onclick="Brainstorm.addSticky('blue')">+</button>
+              <button class="add-sticky-btn sticky-green" title="Green" onclick="Brainstorm.addSticky('green')">+</button>
+              <button class="add-sticky-btn sticky-lavender" title="Lavender" onclick="Brainstorm.addSticky('lavender')">+</button>
+              <button class="add-sticky-btn sticky-peach" title="Peach" onclick="Brainstorm.addSticky('peach')">+</button>
+            </div>
+          </div>
+          <div class="sticky-notes" id="sticky-container"></div>
+        </div>
+      </div>
+
+      <!-- Whiteboard -->
+      <div class="brainstorm-pane" id="pane-whiteboard">
+        <div class="whiteboard-wrapper">
+          <div class="wb-toolbar" id="wb-toolbar">
+            <!-- Pen (click to draw; arrow picks thickness) -->
+            <div class="wb-dd wb-split active" data-tool="pen">
+              <button class="wb-btn" title="Pen" aria-label="Pen" onclick="Whiteboard.setTool('pen')"><svg class="wb-ico" viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(45 12 12)"><path fill="currentColor" d="M9.2 1.5h5.6a1.2 1.2 0 0 1 1.2 1.2V14l-4 8-4-8V2.7a1.2 1.2 0 0 1 1.2-1.2z"/><rect x="10.6" y="3" width="1.6" height="6" rx=".8" fill="var(--wb-ico-cut,#fff)"/></g></svg></button>
+              <button class="wb-btn wb-caret" title="Pen thickness" onclick="Whiteboard.toggleMenu('pen',this)">▾</button>
+              <div class="wb-menu wb-dot-menu" id="wb-menu-pen"></div>
+            </div>
+
+            <!-- Shapes -->
+            <div class="wb-dd">
+              <button class="wb-btn" id="wbt-shapes" title="Shapes" aria-label="Shapes" onclick="Whiteboard.toggleMenu('shapes',this)"><span id="wb-shape-icon"></span></button>
+              <div class="wb-menu" id="wb-menu-shapes">
+                <div class="wb-menu-item" data-shape="line"     onclick="Whiteboard.setShape('line')"><span>╱</span> Line</div>
+                <div class="wb-menu-item" data-shape="arrow"    onclick="Whiteboard.setShape('arrow')"><span>→</span> Arrow</div>
+                <div class="wb-menu-item" data-shape="rect"     onclick="Whiteboard.setShape('rect')"><span>▭</span> Rectangle</div>
+                <div class="wb-menu-item" data-shape="circle"   onclick="Whiteboard.setShape('circle')"><span>○</span> Circle</div>
+                <div class="wb-menu-item" data-shape="diamond"  onclick="Whiteboard.setShape('diamond')"><span>◇</span> Diamond</div>
+                <div class="wb-menu-item" data-shape="triangle" onclick="Whiteboard.setShape('triangle')"><span>△</span> Triangle</div>
+                <div class="wb-menu-item" data-shape="star"     onclick="Whiteboard.setShape('star')"><span>☆</span> Star</div>
+              </div>
+            </div>
+
+            <!-- Color -->
+            <div class="wb-dd">
+              <button class="wb-btn" id="wbt-color" title="Colour" aria-label="Colour" onclick="Whiteboard.toggleMenu('colors',this)"><span class="wb-color-chip" id="wb-color-chip"></span></button>
+              <div class="wb-menu" id="wb-menu-colors">
+                <div id="wb-colors" class="wb-color-grid"></div>
+                <label class="wb-custom-color">Custom <input type="color" id="wb-custom" value="#d32f2f" oninput="Whiteboard.setColor(this.value)"></label>
+              </div>
+            </div>
+
+            <div class="wb-gap"></div>
+
+            <button class="wb-btn" onclick="Whiteboard.undo()">↩ Undo</button>
+
+            <!-- Eraser (click to erase; arrow picks thickness) -->
+            <div class="wb-dd wb-split" data-tool="eraser">
+              <button class="wb-btn" title="Eraser" aria-label="Eraser" onclick="Whiteboard.setTool('eraser')"><svg class="wb-ico" viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(-45 12 12)" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="4" y="7.5" width="16" height="9" rx="2.4" fill="#fff"/><path d="M12 7.5h5.6a2.4 2.4 0 0 1 2.4 2.4v4.2a2.4 2.4 0 0 1-2.4 2.4H12z" fill="#FFD600"/></g></svg></button>
+              <button class="wb-btn wb-caret" title="Eraser thickness" onclick="Whiteboard.toggleMenu('eraser',this)">▾</button>
+              <div class="wb-menu wb-dot-menu" id="wb-menu-eraser"></div>
+            </div>
+
+            <button class="wb-btn" title="Clear" aria-label="Clear" onclick="Whiteboard.clear()"><svg class="wb-ico wb-bin" viewBox="0 0 24 24" aria-hidden="true"><path fill="#D32F2F" d="M9 3h6l1 1.5h4V7H4V4.5h4zM5.5 8.5h13l-1 12a1.5 1.5 0 0 1-1.5 1.4H8a1.5 1.5 0 0 1-1.5-1.4z"/><path fill="#fff" d="M9.2 11h1.4v7H9.2zm4.2 0h1.4v7h-1.4z"/></svg></button>
+
+            <div class="wb-spacer"></div>
+
+            <button class="wb-btn wb-save" onclick="Whiteboard.download()">⬇ Save image</button>
+          </div>
+          <canvas id="wb-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CHARACTERS PANEL ══ -->
+    <div class="panel" id="panel-characters">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;">
+        <div class="page-heading" style="margin:0">
+          <div class="page-title">Characters</div>
+          <div class="page-sub">Build and track your cast</div>
+        </div>
+        <button class="btn btn-accent" onclick="Characters.openModal()">+ New Character</button>
+      </div>
+      <div class="panel-grid panel-grid-3" id="char-grid"></div>
+    </div>
+
+    <!-- ══ PLACES PANEL ══ -->
+    <div class="panel" id="panel-places">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;">
+        <div class="page-heading" style="margin:0">
+          <div class="page-title">Places & Settings</div>
+          <div class="page-sub">The world your story inhabits</div>
+        </div>
+        <button class="btn btn-accent" onclick="Places.openModal()">+ New Place</button>
+      </div>
+      <div class="panel-grid panel-grid-3" id="place-grid"></div>
+    </div>
+
+    <!-- ══ CHAPTERS PANEL ══ -->
+    <div class="panel" id="panel-chapters">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;">
+        <div class="page-heading" style="margin:0">
+          <div class="page-title">Chapters</div>
+          <div class="page-sub">Structure your manuscript</div>
+        </div>
+        <button class="btn btn-accent" onclick="Chapters.openModal()">+ New Chapter</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;" id="chapter-list"></div>
+    </div>
+
+    <!-- ══ WRITING PANEL ══ -->
+    <div class="panel" id="panel-writing">
+      <div class="page-heading write-heading">
+        <div class="page-title">Write</div>
+        <div class="write-stats">
+          <button class="stats-link" onclick="Writing.openStats()">Statistics</button>
+        </div>
+      </div>
+      <div class="panel-writing-inner">
+        <!-- Left sidebar -->
+        <div class="chapter-sidebar-col">
+          <div class="card" style="padding:15px 16px;">
+            <div class="card-title">Chapter</div>
+            <select id="writing-ch-select" class="form-select" style="margin-bottom:8px;" onchange="Writing.selectChapter(this.value)">
+              <option value="" disabled selected hidden>Select a Chapter</option>
+            </select>
+            <div id="writing-ch-create" class="ch-quick-create" style="display:none;">
+              <input id="writing-ch-create-input" class="form-input" placeholder="No chapters in this story, create one" onkeydown="if(event.key==='Enter')Chapters.quickCreate(this.value,true)">
+              <button class="btn btn-accent btn-sm" onclick="Chapters.quickCreate(document.getElementById('writing-ch-create-input').value,true)">Create</button>
+            </div>
+            <div style="font-size:0.74rem;color:var(--text3);text-align:center;margin-top:2px;" id="writing-wc">0 words</div>
+          </div>
+          <div class="card" style="padding:15px 16px;flex:1;overflow-y:auto;">
+            <div class="card-title">Tiny Notes</div>
+            <textarea id="ch-plan" class="form-textarea" style="min-height:130px;font-size:0.84rem;" placeholder="What happens in this chapter?" oninput="Writing.savePlan();App.markUnsaved()"></textarea>
+            <div class="card-title" style="margin-top:24px;">Settings</div>
+            <input id="ch-setting" class="form-input" style="margin-top:4px;font-size:0.84rem;" placeholder="Where does this take place?" oninput="Writing.savePlan();App.markUnsaved()">
+            <div class="card-title" style="margin-top:24px;">Characters Present</div>
+            <input id="ch-chars-present" class="form-input" style="margin-top:4px;font-size:0.84rem;" placeholder="Who appears here?" oninput="Writing.savePlan();App.markUnsaved()">
+          </div>
+        </div>
+        <!-- Editor -->
+        <div class="chapter-editor-col">
+          <div class="editor-container">
+            <div class="editor-toolbar" id="editor-toolbar">
+              <button class="tool-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="Writing.format('bold')" title="Bold"><b>B</b></button>
+              <button class="tool-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="Writing.format('italic')" title="Italic"><i>I</i></button>
+              <button class="tool-btn" data-cmd="underline" onmousedown="event.preventDefault()" onclick="Writing.format('underline')" title="Underline"><u>U</u></button>
+              <button class="tool-btn" data-cmd="strikeThrough" onmousedown="event.preventDefault()" onclick="Writing.format('strikeThrough')" title="Strikethrough"><s>S</s></button>
+              <button class="tool-btn tool-btn-wide" style="margin-left:auto;" onmousedown="event.preventDefault()" onclick="Writing.format('insertHorizontalRule')" title="Insert a horizontal line">Add Line Separator</button>
+            </div>
+            <div id="writing-tab-draft" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+              <div id="chapter-draft" class="editor-body" contenteditable="true"
+                oninput="Writing.onDraftInput()"
+                style="flex:1;min-height:0;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+
+<!-- Project Settings -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">⚙ Project Settings</div>
+      <button class="modal-close" onclick="closeModal('project')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Novel Title</label><input id="ps-title" class="form-input" placeholder="e.g. The Crimson Inheritance"></div>
+      <div class="form-group"><label class="form-label">Subtitle / Tagline</label><input id="ps-subtitle" class="form-input" placeholder="Describe what your novel is about in a line or two"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Author Name</label><input id="ps-author" class="form-input" placeholder="Your name"></div>
+        <div class="form-group"><label class="form-label">Genre</label><input id="ps-genre" class="form-input" placeholder="e.g. Historical Fiction"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('project')">Cancel</button>
+      <button class="btn btn-accent" onclick="App.saveProjectSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Character Modal -->
+<div class="modal-overlay" id="modal-character">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="char-modal-title">New Character</div>
+      <button class="modal-close" onclick="closeModal('character')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name *</label><input id="cf-name" class="form-input" placeholder="e.g. Shruthi"></div>
+        <div class="form-group"><label class="form-label">Age</label><input id="cf-age" class="form-input" placeholder="e.g. 15" type="number"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Gender *</label>
+          <select id="cf-gender" class="form-select" onchange="Characters.pickGender(this.value)">
+            <option value="" disabled hidden>Select</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role *</label>
+          <select id="cf-role" class="form-select">
+            <option value="Protagonist">Protagonist</option>
+            <option value="Antagonist">Antagonist</option>
+            <option value="Supporting">Supporting Character</option>
+            <option value="Mentor">Mentor</option>
+            <option value="Love Interest">Love Interest</option>
+            <option value="Minor">Minor Character</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Portrait builder (appears once a gender is chosen) -->
+      <div class="portrait-builder" id="portrait-builder" style="display:none">
+        <div class="portrait-box"><div class="portrait-stack" id="cf-portrait"><canvas class="portrait-canvas"></canvas><canvas class="portrait-canvas portrait-top"></canvas><img id="cf-own-photo" class="own-photo" alt="" hidden></div>
+          <div class="portrait-extras">
+            <button type="button" class="btn btn-own-photo" onclick="Characters.chooseOwnPhoto()">I want to choose my own photo</button>
+            <label class="simple-opt"><input type="checkbox" id="cf-simple" onchange="Characters.toggleSimple(this.checked)"> I don't want ANY photo</label>
+          </div>
+        </div>
+        <div class="portrait-controls" id="cf-controls">
+          <div class="portrait-row">
+            <label class="form-label">Hairstyle</label>
+            <select id="cf-hair" class="form-select" onchange="Characters.pickHair(this.value)"></select>
+          </div>
+          <div class="portrait-row" id="cf-clothes-row" style="display:none">
+            <label class="form-label">Change clothes</label>
+            <div class="clothes-switch">
+              <button type="button" class="clothes-arrow" id="cf-clothes-prev" onclick="Characters.stepClothes(-1)" title="Previous outfit">‹</button>
+              <span class="clothes-count" id="cf-clothes-count">1 / 1</span>
+              <button type="button" class="clothes-arrow" id="cf-clothes-next" onclick="Characters.stepClothes(1)" title="Next outfit">›</button>
+            </div>
+          </div>
+          <div class="portrait-row" id="cf-haircolor-row" style="display:none">
+            <label class="form-label">Hair colour</label>
+            <div class="swatch-row" id="cf-haircolor"></div>
+          </div>
+          <div class="portrait-row">
+            <label class="form-label">Eye colour</label>
+            <div class="swatch-row" id="cf-eyecolor"></div>
+          </div>
+          <div class="portrait-row">
+            <label class="form-label">Skin tone</label>
+            <div class="swatch-row" id="cf-skincolor"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Removable fields -->
+      <div id="char-fields">
+        <div class="form-group" id="field-wrap-appearance">
+          <label class="form-label">Appearance <button class="field-remove-btn" onclick="removeField('appearance')" title="Remove this field">✕</button></label>
+          <textarea id="cf-appearance" class="form-textarea" placeholder="Describe how they look: hair, eyes, clothing style, anything distinctive"></textarea>
+        </div>
+        <div class="form-group" id="field-wrap-motivation">
+          <label class="form-label">Goal / Motivation <button class="field-remove-btn" onclick="removeField('motivation')" title="Remove this field">✕</button></label>
+          <textarea id="cf-motivation" class="form-textarea" placeholder="What does this character want, and why?"></textarea>
+        </div>
+        <div class="form-group" id="field-wrap-ismain">
+          <label class="form-label">Is this the main character?</label>
+          <div class="radio-row">
+            <label class="radio-opt"><input type="radio" name="cf-ismain" value="yes" checked onchange="Characters.syncMain()"> Yes</label>
+            <label class="radio-opt"><input type="radio" name="cf-ismain" value="no" onchange="Characters.syncMain()"> No</label>
+          </div>
+        </div>
+        <div class="form-group" id="field-wrap-relationship">
+          <label class="form-label">Relationship to Main Character <button class="field-remove-btn" onclick="removeField('relationship')" title="Remove this field">✕</button></label>
+          <input id="cf-relationship" class="form-input" placeholder="e.g. Family member, best friend, rival">
+        </div>
+        <div class="form-row" id="field-wrap-tags">
+          <div class="form-group">
+            <label class="form-label">Flaws <button class="field-remove-btn" onclick="removeField('tags')" title="Remove this field">✕</button></label>
+            <input id="cf-flaws" class="form-input" placeholder="e.g. Bossy, Stubborn">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Likes / Interests</label>
+            <input id="cf-likes" class="form-input" placeholder="e.g. Old books, horses">
+          </div>
+        </div>
+        <div class="form-group" id="field-wrap-notes">
+          <label class="form-label">Notes <button class="field-remove-btn" onclick="removeField('notes')" title="Remove this field">✕</button></label>
+          <textarea id="cf-notes" class="form-textarea" placeholder="Backstory, arc ideas, anything else..."></textarea>
+        </div>
+      </div>
+      <input type="hidden" id="cf-editing-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="char-delete-btn" style="margin-right:auto;display:none" onclick="Characters.delete()">Delete</button>
+      <button class="btn" onclick="closeModal('character')">Cancel</button>
+      <button class="btn btn-accent" onclick="Characters.save()">Save Character</button>
+    </div>
+  </div>
+</div>
+
+<!-- Place Modal -->
+<div class="modal-overlay" id="modal-place">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="place-modal-title">New Place</div>
+      <button class="modal-close" onclick="closeModal('place')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Place Name *</label><input id="pf-name" class="form-input" placeholder="e.g. Vinata History Museum"></div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div id="pf-type-cascade" class="type-cascade"></div>
+      </div>
+      <div id="place-fields">
+        <div class="form-group" id="field-wrap-pdesc">
+          <label class="form-label">Description <button class="field-remove-btn" onclick="removeField('pdesc')" title="Remove">✕</button></label>
+          <textarea id="pf-desc" class="form-textarea" placeholder="What does it look like? What's the history?"></textarea>
+        </div>
+        <div class="form-group" id="field-wrap-patm">
+          <label class="form-label">Mood <button class="field-remove-btn" onclick="removeField('patm')" title="Remove">✕</button></label>
+          <input id="pf-atmosphere" class="form-input" placeholder="e.g. Foreboding, Grand">
+        </div>
+        <div class="form-group" id="field-wrap-psensory">
+          <label class="form-label">Sensory Details <button class="field-remove-btn" onclick="removeField('psensory')" title="Remove">✕</button></label>
+          <textarea id="pf-sensory" class="form-textarea" placeholder="Smell, sound, temperature, lighting..."></textarea>
+        </div>
+        <div class="form-group" id="field-wrap-psig">
+          <label class="form-label">Story Significance <button class="field-remove-btn" onclick="removeField('psig')" title="Remove">✕</button></label>
+          <textarea id="pf-significance" class="form-textarea" placeholder="Why does this place matter?"></textarea>
+        </div>
+      </div>
+      <input type="hidden" id="pf-editing-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="place-delete-btn" style="margin-right:auto;display:none" onclick="Places.delete()">Delete</button>
+      <button class="btn" onclick="closeModal('place')">Cancel</button>
+      <button class="btn btn-accent" onclick="Places.save()">Save Place</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chapter Modal -->
+<div class="modal-overlay" id="modal-chapter">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="ch-modal-title">New Chapter</div>
+      <button class="modal-close" onclick="closeModal('chapter')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Number / Label</label><input id="chf-num" class="form-input" placeholder="e.g. I or Prologue"></div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="chf-status" class="form-select">
+            <option value="draft">In progress</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Title</label><input id="chf-title" class="form-input" placeholder="e.g. The Letter"></div>
+      <div class="form-group"><label class="form-label">Summary / Plans</label><textarea id="chf-summary" class="form-textarea" style="min-height:110px;" placeholder="What happens? Notes, bullet points, anything."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Characters</label><input id="chf-chars" class="form-input" placeholder="e.g. Nisha, Varun"></div>
+        <div class="form-group"><label class="form-label">Setting(s)</label><input id="chf-setting" class="form-input" placeholder="e.g. Museum"></div>
+      </div>
+      <input type="hidden" id="chf-editing-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="ch-delete-btn" style="margin-right:auto;display:none" onclick="Chapters.delete()">Delete</button>
+      <button class="btn" onclick="closeModal('chapter')">Cancel</button>
+      <button class="btn btn-accent" onclick="Chapters.save()">Save Chapter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="modal-photo">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">Position your picture</div>
+      <button class="modal-close" onclick="Photos.cancel()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="photo-stage" class="photo-stage"><img id="photo-stage-img" alt="" draggable="false"></div>
+      <label class="photo-zoom-row">Zoom <input id="photo-zoom" type="range" min="0" max="1" step="0.01" value="0" oninput="Photos.zoom(this.value)"></label>
+      <div class="photo-actions">
+        <button class="btn" onclick="Photos.cancel()">Cancel</button>
+        <button class="btn btn-primary" onclick="Photos.apply()">Use this picture</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-stats">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header">
+      <div class="modal-title">Statistics</div>
+      <button class="modal-close" onclick="closeModal('stats')">✕</button>
+    </div>
+    <div class="modal-body">
+      <select id="stats-scope" class="form-select" style="margin-bottom:14px;" onchange="Writing.renderStats()">
+        <option value="chapter">This chapter</option>
+        <option value="story">Whole story</option>
+      </select>
+      <table class="stats-table"><tbody id="stats-body"></tbody></table>
+      <div style="text-align:right;margin-top:14px;"><button class="btn" onclick="closeModal('stats')">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Backup & Sync Modal -->
+<div class="modal-overlay" id="modal-sync">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">☁ Backup &amp; Sync</div>
+      <button class="modal-close" onclick="closeModal('sync')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <p class="sync-intro">At the moment, your data is saved, but can be lost if you clear history/cache in your browser. To have a better backup, choose a file in Google Drive, Dropbox, OneDrive or iCloud and it syncs everywhere too.</p>
+      <div style="display:none"><span id="sync-storage-text"></span></div>
+
+      <div class="sync-block" id="sync-drive-section">
+        <div class="sync-row" id="sync-drive-row" style="display:none"><div class="status-dot disconnected" id="sync-drive-dot"></div><span id="sync-drive-text">Not connected</span></div>
+        <div class="sync-actions">
+          <button class="btn btn-accent btn-sm" id="sync-drive-connect" onclick="Drive.connect()">Sign in with Google</button>
+          <button class="btn btn-sm" id="sync-drive-now" style="display:none" onclick="Drive.syncNow()">Sync now</button>
+        </div>
+      </div>
+
+      <div class="sync-block" id="sync-file-section" style="display:none">
+        <div class="export-section-title">💾 Auto-backup to a file</div>
+        <div class="sync-row"><div class="status-dot disconnected" id="sync-file-dot"></div><span id="sync-file-text">Off</span></div>
+        <div class="sync-actions">
+          <button class="btn btn-sm btn-accent" id="sync-file-choose" onclick="Backup.chooseFile()">Choose backup file…</button>
+          <button class="btn btn-sm btn-accent" id="sync-file-reconnect" style="display:none" onclick="Backup.reconnectFile()">Reconnect</button>
+          <button class="btn btn-sm btn-danger" id="sync-file-stop" style="display:none" onclick="Backup.stopFile()">Stop</button>
+        </div>
+      </div>
+
+      <div class="sync-block">
+        <p class="sync-desc" id="sync-last-backup" style="display:none"></p>
+        <p class="sync-desc">Not using Google sign-in? Download everything as a file and keep it somewhere safe.</p>
+        <div class="sync-actions"><button class="btn btn-sm" onclick="Storage.exportJSON()">Download backup</button></div>
+        <p class="sync-desc" style="margin-top:28px">Lost your writing, or moving to a new device? Pick a backup file you downloaded earlier to bring it all back. This replaces what's currently in this browser.</p>
+        <div class="sync-actions">
+          <button class="btn btn-sm" onclick="document.getElementById('restore-input2').click()">Restore from file</button>
+          <input type="file" id="restore-input2" accept=".json" style="display:none" onchange="Storage.importJSON(this)">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('sync')">Close</button></div>
+  </div>
+</div>
+
+<!-- Ambience button + popover -->
+<button class="ambience-fab" id="ambience-fab" onclick="Ambience.toggle()" title="Change ambience">🎧 <span>Ambience</span></button>
+<div class="ambience-panel" id="ambience-panel">
+  <div class="ambience-head">
+    <div class="modal-title">Ambience</div>
+    <button class="modal-close" onclick="Ambience.toggle()">✕</button>
+  </div>
+  <div class="ambience-body">
+    <div class="amb-heading">Vibe 😎</div>
+    <div class="theme-swatches" id="theme-swatches">
+      <div class="swatch swatch-light active" title="Light"></div>
+      <div class="swatch swatch-dark" title="Dark"></div>
+      <div class="swatch swatch-midnight" title="Midnight"></div>
+      <div class="swatch swatch-typewriter" title="Typewriter"></div>
+      <div class="swatch swatch-horror" title="Horror"></div>
+      <div class="swatch swatch-rose" title="Rose"></div>
+      <div class="swatch swatch-emerald" title="Emerald Forest"></div>
+      <div class="swatch swatch-enchanted" title="Enchanted"></div>
+    </div>
+    <div class="amb-heading">Background sounds</div>
+    <div class="amb-list" id="ambiance-btns">
+      <button class="amb-opt" data-sound="rain">Rain</button>
+      <button class="amb-opt" data-sound="piano">Soft piano</button>
+      <button class="amb-opt" data-sound="wind">Wind</button>
+      <button class="amb-opt" data-sound="fire">Fire</button>
+    </div>
+    <div class="amb-heading">Keystrokes</div>
+    <div class="amb-list" id="keystroke-btns">
+      <button class="amb-opt" data-key="typewriter">Typewriter</button>
+      <button class="amb-opt" data-key="pen">Pen scratching</button>
+    </div>
+  </div>
+</div>
+
+<!-- Persistent pause control for background sound -->
+<div class="sound-pill" id="sound-pill">
+  <span class="sound-pill-name" id="sound-pill-name"></span>
+  <button class="sound-pill-btn" id="sound-pill-btn" onclick="Ambience.togglePause()" title="Pause background sound">❚❚</button>
+</div>
+
+<!-- Projects modal -->
+<div class="modal-overlay" id="modal-projects">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">Your Projects</div>
+      <button class="modal-close" onclick="closeModal('projects')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="projects-list"></div>
+      <div class="project-new">
+        <input id="project-new-title" class="form-input" placeholder="Title of a new novel…" onkeydown="if(event.key==='Enter')Projects.create()">
+        <button class="btn btn-accent btn-sm" onclick="Projects.create()">Save</button>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal('projects')">Close</button></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS — order matters
+══════════════════════════════════════════ -->
+<script src="js/storage.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/portrait.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/places.js"></script>
+<script src="js/chapters.js"></script>
+<script src="js/writing.js"></script>
+<script src="js/brainstorm.js"></script>
+<script src="js/whiteboard.js"></script>
+<script src="js/config.js"></script>
+<script src="js/ambience.js"></script>
+<script src="js/sparkle.js"></script>
+<script src="js/welcome.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/multipick.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/drive.js"></script>
+<script src="js/backup.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
