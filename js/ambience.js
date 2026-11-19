@@ -1,10 +1,5 @@
 /* ═══════════════════════════════════════════
    ambience.js — floating "Ambience" panel + pause control
-   Pick a vibe (theme), a background sound and a keystroke sound,
-   Every click applies and is remembered straight away (no Save / Cancel).
-   Preferences are global (not per project) and remembered.
-   While a background sound is on, a ❚❚ pause control sits at the top
-   centre of the page so it can be stopped from anywhere.
    ═══════════════════════════════════════════ */
 
 const Ambience = (() => {
