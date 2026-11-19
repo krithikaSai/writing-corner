@@ -1,14 +1,5 @@
 /* ═══════════════════════════════════════════
    portrait.js — Layered character portraits
-
-   Images live in  images/characters/<gender>/
-     base.webp            bald base figure
-     eyes.webp            mask: where the eyes are
-     <hairstyle>/1.webp … full figure with that hairstyle, one file per outfit
-     <hairstyle>/hair.webp  mask: where the hair is
-
-   Hair and eye colours are painted on with the masks, so every
-   hairstyle/outfit you add works automatically.
    ═══════════════════════════════════════════ */
 
 const Portrait = (() => {
