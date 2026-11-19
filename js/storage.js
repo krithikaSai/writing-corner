@@ -1,13 +1,5 @@
 /* ═══════════════════════════════════════════
    storage.js — Library of projects, IndexedDB persistence, JSON backup
-
-   • One "library" holds many projects (novels) + global preferences
-   • Storage.get() always returns the ACTIVE project, so every other
-     module keeps working exactly as before
-   • Primary store: IndexedDB (no 5 MB cap, so whiteboards are safe)
-   • Fallback:      localStorage (if IndexedDB is unavailable)
-   • Migrates automatically from older single-project saves
-   • The public API stays synchronous: get() / save(s)
    ═══════════════════════════════════════════ */
 
 const Storage = (() => {
