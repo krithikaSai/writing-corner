@@ -1,9 +1,5 @@
 /* ═══════════════════════════════════════════
    multipick.js — "pick from what you've already created"
-
-   Adds a small ▾ button inside a text field. It opens a checklist of the
-   project's existing Places or Characters; ticking several fills the field
-   with comma-separated names. The user can still just type anything.
    ═══════════════════════════════════════════ */
 
 const MultiPick = (() => {
