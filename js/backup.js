@@ -1,12 +1,5 @@
 /* ═══════════════════════════════════════════
    backup.js — "Backup & Sync" controller
-
-   Three independent safety nets, all optional for the user:
-   1. Auto-backup to a file they pick once (Chrome/Edge/Opera). If that
-      file lives in a Drive/Dropbox/OneDrive/iCloud folder, it also syncs.
-   2. One-click Google Drive sync (see drive.js)
-   3. Manual download / restore (works in every browser)
-   Plus a small status chip in the top bar so users always know.
    ═══════════════════════════════════════════ */
 
 const Backup = (() => {
@@ -163,7 +156,8 @@ const Backup = (() => {
       dot.className = 'status-dot ' + dotCls;
       txt.textContent = t;
       $('sync-drive-connect').style.display = d.connected ? 'none' : '';
-      $('sync-drive-now').style.display = d.connected ? '' : 'none';
+      // Syncing is automatic; only offer the button when it needs the user's help (signed out / error / conflict)
+      $('sync-drive-now').style.display = d.connected && ['needs-auth', 'error', 'conflict'].includes(d.status) ? '' : 'none';
     }
 
     // 3. Auto-backup file
