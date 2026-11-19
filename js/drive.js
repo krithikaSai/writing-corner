@@ -78,12 +78,12 @@ const Drive = (() => {
   }
 
   // Must be called from a click handler the first time (popup rules).
-  function getToken() {
+  function getToken(prompt = '') {
     if (hasToken()) return Promise.resolve(token);
     if (!tokenClient) return Promise.reject(new Error('Google sign-in is still loading'));
     return new Promise((resolve, reject) => {
       pendingTok = { resolve, reject };
-      tokenClient.requestAccessToken({ prompt: '' });
+      tokenClient.requestAccessToken({ prompt });
     });
   }
 
@@ -194,7 +194,7 @@ const Drive = (() => {
     if (!configured()) { Toast.show('Google sign-in isn’t set up yet.'); return; }
     try {
       await loadGis();
-      await getToken();                 // popup — user clicked, so this is allowed
+      await getToken('select_account'); // popup — user clicked, so this is allowed
     } catch (e) {
       if (e && (e.type === 'popup_closed' || e.error === 'access_denied')) { Toast.show('Google sign-in cancelled.'); return; }
       Toast.show(e?.message || 'Could not sign in with Google.', 'error');
