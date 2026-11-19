@@ -1,11 +1,5 @@
 /* ═══════════════════════════════════════════
    drive.js — One-click sync with the user's own Google Drive
-
-   • Uses the hidden per-app "appDataFolder": only this app can see it,
-     it never shows up in the user's normal Drive, and no backend is needed.
-   • Scope: drive.appdata (the narrowest Drive scope there is).
-   • Local autosave never depends on this module — if the Google token
-     expires the app keeps working and just asks to reconnect.
    ═══════════════════════════════════════════ */
 
 const Drive = (() => {
