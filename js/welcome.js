@@ -6,11 +6,11 @@ const Welcome = (() => {
   const el = id => document.getElementById(id);
 
   function init() {
-    const connected = window.Drive && Drive.isConnected && Drive.isConnected();
+    const connected = typeof Drive !== 'undefined' && Drive.isConnected && Drive.isConnected();
     if (seen() || connected) return;
     el('welcome').style.display = 'flex';
-    if (window.Drive && Drive.configured && Drive.configured()) Drive.loadGis().catch(() => {});   // preload so the sign-in popup isn't blocked
-    if (!(window.Drive && Drive.configured && Drive.configured())) {
+    if (typeof Drive !== 'undefined' && Drive.configured && Drive.configured()) Drive.loadGis().catch(() => {});   // preload so the sign-in popup isn't blocked
+    if (!(typeof Drive !== 'undefined' && Drive.configured && Drive.configured())) {
       el('welcome-pop-text').textContent = 'Your writing is saved privately on this device, in this browser. You can back it up any time from Backup & Sync.';
       el('welcome-go').textContent = 'Continue';
     }
@@ -19,7 +19,7 @@ const Welcome = (() => {
   function later() { el('welcome-pop').classList.remove('open'); close(); }   // "Not now": enter the app without signing in
   function close() { mark(); const w = el('welcome'); w.classList.add('leaving'); setTimeout(() => { w.style.display = 'none'; }, 450); }
   async function go() {
-    if (window.Drive && Drive.configured && Drive.configured()) {
+    if (typeof Drive !== 'undefined' && Drive.configured && Drive.configured()) {
       await Drive.connect();
       // Only enter the app once Google sign-in actually worked; if it was cancelled, stay here so they can retry or pick "Not now".
       if (!Drive.isConnected()) return;
