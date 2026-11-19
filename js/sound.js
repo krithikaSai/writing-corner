@@ -1,12 +1,5 @@
 /* ═══════════════════════════════════════════
    sound.js — Background sounds + keystroke audio
-
-   Background sounds: rain, piano (soft piano), wind, fire
-   Keystrokes:        typewriter, pen (pen scratching)
-
-   Each sound first looks for a real recording in the audio/ folder
-   (see audio/README.txt). If the file isn't there, a built-in generated
-   version plays instead, so everything works with no downloads.
    ═══════════════════════════════════════════ */
 
 const Sound = (() => {
